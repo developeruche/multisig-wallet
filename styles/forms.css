@@ -1,0 +1,46 @@
+input[type="radio"]:checked+label,
+input[type="radio"]:not(:checked)+label,
+input[type="checkbox"]:checked+label,
+input[type="checkbox"]:not(:checked)+label {
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #666;
+}
+
+input[type="radio"]:checked+label:before,
+input[type="radio"]:not(:checked)+label:before {
+    border-radius: 100%;
+}
+
+input[type="radio"]:checked+label:after,
+input[type="radio"]:not(:checked)+label:after {
+    border-radius: 100%;
+}
+
+.form-control {
+    padding: 4px 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.117);
+    background: transparent;
+    width: 100% !important;
+    color: rgba(255, 255, 255, 0.833);
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 32px;
+    letter-spacing: 0.01pt;
+}
+
+.form-control::placeholder {
+    color: #222222;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 32px;
+    letter-spacing: 0.01pt;
+}
+.form-control:hover,
+.form-control:focus {
+    border-color: #ece1e925!important;
+}
