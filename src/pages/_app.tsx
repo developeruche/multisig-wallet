@@ -5,22 +5,28 @@ import "aos/dist/aos.css";
 import {
   WagmiConfig,
   createClient,
-  defaultChains,
+  chain,
   configureChains,
 } from 'wagmi';
 // import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { infuraProvider } from 'wagmi/providers/infura';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { publicProvider } from 'wagmi/providers/public';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { StoreProvider } from "../components/stateManager/store";
 
 
-const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
-  infuraProvider({ apiKey: '965a992142e64206ad4e67bd922124af' }),
-  publicProvider(),
-])
+const { chains, provider, webSocketProvider } = configureChains([chain.polygonMumbai, chain.polygon],   [
+  jsonRpcProvider({
+    rpc: (chain) => ({
+      http: `https://maximum-cold-voice.matic-testnet.discover.quiknode.pro/a1d6dd83e4bea19c9b833726656e641ed5f41b9e`,
+    }),
+  }),
+],)
 
 const client = createClient({
   autoConnect: true,
@@ -55,7 +61,21 @@ function MyApp({ Component, pageProps }: AppProps) {
   return(
     <ThemeProvider>
       <WagmiConfig client={client}>
-        <Component {...pageProps} />
+        <StoreProvider>
+          <Component {...pageProps} />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme='dark'
+          />
+        </StoreProvider>
       </WagmiConfig>
 
       <div id="app-bottom-sheet" />

@@ -6,6 +6,13 @@ import { useEffect, useState } from "react";
 import { NewProposalMd, NewProposalSm } from "../components/core/NewProposal";
 import { BiDotsVerticalRounded } from "react-icons/bi"
 import ClickAwayListener from 'react-click-away-listener';
+import {getWalletAddress, CHAIN_ID, FACTORY_CONTRACT_ADDRESS} from "../components/globals/actions";
+import {useContractReads, useContractRead} from "wagmi";
+import {Factory, Wallet} from "../components/globals/abi";
+import { toast } from 'react-toastify';
+import router from "next/router";
+
+
 
 const formatAddress = (address: any) => {
   return address?.substring(0, 6) + "..." + address?.slice(0, 4);
@@ -21,18 +28,73 @@ const Dashboard: NextPage = () => {
   const [showId, setShowId] = useState<string | number>("");
 
 
+  const [owners, setOwner] = useState<any[]>();
+  const [wallet, setWallet] = useState<any>();
 
-  let wallet: string = "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7";
-  let owners: Array<any> = [
-    "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7",
-    "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7",
-    "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7",
-  ];
+
+
+  // let wallet: string = "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7";
+  // let owners: Array<any> = [
+  //   "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7",
+  //   "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7",
+  //   "0x7A3E0DFf9B53fA0d3d1997903A48677399b22ce7",
+  // ];
+
+
+  const { data: txCount, isError: txCountError, isLoading: txCountLoading } = useContractRead({
+    addressOrName: wallet,
+    contractInterface: Wallet,
+    functionName: 'getTransactionCount',
+  })
+
+  let init_tx_data = [
+    {
+      addressOrName: FACTORY_CONTRACT_ADDRESS,
+      contractInterface: Factory,
+      functionName: 'getWalletOwners',
+      args: [wallet]
+    },
+  ]
+
+  const { data: initData, isError: initDataError, isLoading: initDataLoading } = useContractReads({
+    contracts: init_tx_data,
+  })
+
+
+  
 
   const openModal = (id: string | number) => {
     setDropdown(true);
     setShowId(id)
   }
+
+
+  const obtainOwner = () => {
+
+  }
+
+  const obtainWallet = async () => {
+    const addr = await getWalletAddress();
+    if(addr == undefined || addr == null) {
+      toast.error('Your wallet is not connected', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+      
+      router.push("/");
+      return;
+    }
+    setWallet(addr);
+  }
+
+  useEffect(() => {
+    obtainWallet();
+  }, [])
 
   useEffect(() => {
     if(copy) {
@@ -50,7 +112,7 @@ const Dashboard: NextPage = () => {
           <div className="flex justify-between">
             <div className="flex items-center">
               <span className="text-2xl proposal__dashboard__address__title">Owners: </span>
-              {owners.map((addr, index) => (
+              {initData && initData![0]?.map((addr, index) => (
                 <span
                   key={index}
                   className="bg-base90 ml-3 px-4 py-2 text-xl rounded-lg proposal__dashboard__owner__address"
