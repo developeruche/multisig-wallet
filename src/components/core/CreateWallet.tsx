@@ -3,7 +3,7 @@ import AppModal from './AppModal';
 import BottomSheet from './BottomSheet';
 import {AiOutlineDelete} from "react-icons/ai";
 import AOS from "aos";
-import {CHAIN_ID, BANK_CONTRACT_ADDRESS, FACTORY_CONTRACT_ADDRESS, storeNewWalletAddress, getWalletAddress} from "../globals/actions"
+import {CHAIN_ID, BANK_CONTRACT_ADDRESS, FACTORY_CONTRACT_ADDRESS, storeNewWalletAddress, getWalletAddress, storeConfirmation} from "../globals/actions"
 import { toast } from 'react-toastify';
 import {
   useAccount,
@@ -34,6 +34,7 @@ function CreateWalletMd({setIsCreateWalletMd, isCreateWalletMd}: IAppModalMd) {
 
   const storeAndRedirect = (address: string) => {
     storeNewWalletAddress(address);
+    storeConfirmation(minimunPermission);
     router.push("/dashboard");
   }
 
