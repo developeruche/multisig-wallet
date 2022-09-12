@@ -2,10 +2,19 @@ import React, { createRef, Dispatch, Fragment, SetStateAction, useState } from '
 import AppModal from './AppModal';
 import BottomSheet from './BottomSheet';
 import Select from 'react-select';
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
+import { Wallet } from '../globals/abi';
+import { CHAIN_ID } from '../globals/actions';
+import { ethers } from 'ethers';
+import { toast } from 'react-toastify';
+import router from "next/router";
+
+
 
 interface IAppModalMd {
   setIsNewProposalMd: Dispatch<SetStateAction<boolean>>, 
   isNewProposalMd: boolean,
+  wallet: any,
 }
 interface IAppModalSm {
   setIsNewProposalSm: Dispatch<SetStateAction<boolean>>, 
@@ -14,33 +23,17 @@ interface IAppModalSm {
 
 const options = [
   { value: 'address', label: 'Address' },
-  { value: 'uint', label: 'Uint' },
+  { value: 'uint256', label: 'Uint256' },
   { value: 'bytes', label: 'Bytes' },
   { value: 'bool', label: 'Boolean' },
 ];
 
-function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
+function NewProposalMd({setIsNewProposalMd, isNewProposalMd, wallet}: IAppModalMd) {
   
   const [selectedOption, setSelectedOption] = useState(null);
-  const [hasTransactionData, setHasTransactionData] = useState<boolean>(false);
+  const [hasTransactionData, setHasTransactionData] = useState<boolean>(true);
 
   const submitBtn = createRef<HTMLButtonElement>();
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-
-    let data;
-    
-    hasTransactionData 
-      ? data = {proposalName, addressTo, functionName, valueOfEther}
-      : data = {proposalName, addressTo, functionSigArgs, valueOfEther}
-
-
-    console.log(data);
-    
-
-    //
-  };
 
 
   const [proposalName, setProposalName] = useState<string>("")
@@ -48,6 +41,7 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
   const [functionSigArgs, setFunctionSigArgs] = useState<string>("")
   const [valueOfEther, setValueOfEther] = useState<string>("")
   const [functionName, setFunctionName] = useState<string>("")
+  const [functionData, setFunctionData] = useState("");
 
 
 
@@ -77,7 +71,134 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
     setSelectList([...selectList, { address: "" }]);
   };
 
+  const prepFunctionData = () => {
 
+  }
+
+  const handleSuccessful = () => {
+    toast.success('Proposal has been submitted', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+
+    router.reload();
+  }
+
+
+
+  const { data, write, isError, error } = useContractWrite({
+    mode: 'recklesslyUnprepared',
+    addressOrName: wallet,
+    contractInterface: Wallet,
+    functionName: 'submitTransaction',
+    args: [addressTo, valueOfEther == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(valueOfEther), hasTransactionData ? functionSigArgs : "", proposalName],
+    chainId: CHAIN_ID
+  });
+
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  const onTxCreated = () => {
+    setIsNewProposalMd(false);
+    setProposalName("");
+    setAddressTo("");
+    setFunctionData("");
+    setFunctionName("");
+    setFunctionSigArgs("");
+    setValueOfEther("");
+
+    toast.loading('Proposal is been submitted', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+  }
+
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    
+
+    // let data;
+    
+    // hasTransactionData 
+    //   ? data = {proposalName, addressTo, functionSigArgs, valueOfEther}
+    //   : data = {proposalName, addressTo, functionData, valueOfEther}
+
+    // Handling validation ==>
+    if(proposalName=="") {
+      toast.error('Proposal name is empty', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+
+        return;
+    }
+    if(addressTo=="") {
+      toast.error('Address is empty', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+
+        return;
+    }
+
+    if(hasTransactionData) {
+      if(functionSigArgs=="") {
+        toast.error('Enter function signature', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          });
+  
+          return;
+      }
+    } else {
+      if(functionData=="") {
+        toast.error('Enter function data', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          });
+  
+          return;
+      }
+    }
+
+
+    write();
+    onTxCreated();
+
+  };
 
 
 
@@ -95,7 +216,7 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
             <div className="px-7 mt-8">
               <form onSubmit={handleSubmit}>
                 {
-                  !hasTransactionData ? (
+                  hasTransactionData ? (
                     <Fragment>
                       <div className="grid grid-cols-2">
                         <div className="form-group mb-5">
@@ -126,7 +247,7 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
                           name="functionSigArgs"
                           id="address"
                           className='form-control form-textarea'
-                          placeholder='Function Signature Arguments'
+                          placeholder='Function Signature & Arguments'
                           onChange={(e) => setFunctionSigArgs(e.target.value)}
                           cols={30}
                           rows={3}
@@ -139,7 +260,7 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
                           type="text"
                           id="valueOfEther"
                           className='form-control'
-                          placeholder='Value Of Ether'
+                          placeholder='Value Of Matic'
                           onChange={(e) => setValueOfEther(e.target.value)}
                         />
                       </div>
@@ -271,6 +392,7 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
           <AppModal.Footer>
             <div className="flex justify-between add__address__footer">
               <div className="flex">
+                <>{isSuccess && handleSuccessful()}</>
                 <button
                   type={'button'}
                   onClick={() => setIsNewProposalMd(false)}
@@ -292,8 +414,9 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd}: IAppModalMd) {
                 type={'button'}
                 onClick={() => submitBtn.current?.click()}
               >
-                Transact
+                {isLoading ? "Transacting..." : "Transact"}
               </button>
+              
             </div>
           </AppModal.Footer>
         </AppModal.Cover>

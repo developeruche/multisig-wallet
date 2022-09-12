@@ -12,6 +12,7 @@ import {Factory, Wallet} from "../components/globals/abi";
 import { toast } from 'react-toastify';
 import router from "next/router";
 import DashboardTransactions from "../components/core/DashboardTransactions";
+import Head from "next/head"
 
 
 
@@ -109,6 +110,9 @@ const Dashboard: NextPage = () => {
 
   return (
     <div>
+      <Head>
+        <title>Consense | Dashboard</title>
+      </Head>
       <Layout>
         <div className="px-6 md:px-12 lg:px-24 text-white mt-8 proposal__dashboard">
           <div className="flex justify-between">
@@ -165,7 +169,7 @@ const Dashboard: NextPage = () => {
           </div>
           
           {
-            initData && <DashboardTransactions dropdown={dropdown} openModal={openModal} setDropdown={setDropdown} showId={showId} wallet={wallet} Wallet={Wallet} txCount={initData![1]} min={miniR}/>
+            initData && <DashboardTransactions openModal={openModal} wallet={wallet} Wallet={Wallet} txCount={initData![1]} min={miniR}/>
           }
         </div>
       </Layout>
@@ -175,6 +179,7 @@ const Dashboard: NextPage = () => {
       <NewProposalMd
         setIsNewProposalMd={setIsNewProposalMd}
         isNewProposalMd={isNewProposalMd}
+        wallet={wallet}
       />
 
       <NewProposalSm

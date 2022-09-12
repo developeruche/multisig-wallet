@@ -5,7 +5,7 @@ import WhatWeDo from '../components/WhatWeDo';
 import {getWalletAddress} from "../components/globals/actions";
 import { useEffect, useState } from 'react';
 import router from "next/router";
-
+import Head from "next/head";
 
 const Home: NextPage = () => {
   const [address, setAddress] = useState<any>();
@@ -28,6 +28,9 @@ const Home: NextPage = () => {
 
   return (
     <div>
+      <Head>
+        <title>Consense | Home</title>
+      </Head>
       <Layout>
         <HeroSection />
 

@@ -20,11 +20,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { StoreProvider } from "../components/stateManager/store";
 
 
-const { chains, provider, webSocketProvider } = configureChains([chain.ropsten, chain.polygonMumbai, chain.polygon],   [
+const { chains, provider, webSocketProvider } = configureChains([chain.polygonMumbai, chain.polygon],   [
   jsonRpcProvider({
     rpc: (chain) => ({
-      http: `https://ropsten.infura.io/v3/965a992142e64206ad4e67bd922124af`,
-      // http: `https://maximum-cold-voice.matic-testnet.discover.quiknode.pro/a1d6dd83e4bea19c9b833726656e641ed5f41b9e`,
+      http: `https://maximum-cold-voice.matic-testnet.discover.quiknode.pro/a1d6dd83e4bea19c9b833726656e641ed5f41b9e`,
     }),
   }),
 ],)

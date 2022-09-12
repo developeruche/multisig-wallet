@@ -36,6 +36,7 @@ function CreateWalletMd({setIsCreateWalletMd, isCreateWalletMd}: IAppModalMd) {
     storeNewWalletAddress(address);
     storeConfirmation(minimunPermission);
     router.push("/dashboard");
+    console.log("working........")
   }
 
   useContractEvent({
@@ -124,6 +125,10 @@ function CreateWalletMd({setIsCreateWalletMd, isCreateWalletMd}: IAppModalMd) {
     write();
 
     console.log(data)
+
+    // if(waitData) {
+    //   router.push("/dashboard")
+    // }
   };
 
   const { isLoading, isSuccess } = useWaitForTransaction({
@@ -153,6 +158,8 @@ function CreateWalletMd({setIsCreateWalletMd, isCreateWalletMd}: IAppModalMd) {
       draggable: true,
       progress: undefined,
     })
+
+    // router.push("/dashboard");
   }
 
 
