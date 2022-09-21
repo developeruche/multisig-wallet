@@ -56,6 +56,15 @@ const Navbar: React.FC<NavBartItemProps> = () => {
               </Link>
             </div>
           </div>
+
+          <div className="flex dashboard__link">
+            <TbLayoutDashboard />
+            <div className="dashboard__link__inner">
+                <a href="https://consense-bank.vercel.app">
+                  Bank
+                </a>
+            </div>
+          </div>
           <div className="lg:w-[30%] w-[35%] md:flex justify-end hidden">
             {
               isConnected ? (
