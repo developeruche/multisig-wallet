@@ -97,7 +97,10 @@ function NewProposalMd({setIsNewProposalMd, isNewProposalMd, wallet}: IAppModalM
     contractInterface: Wallet,
     functionName: 'submitTransaction',
     args: [addressTo, valueOfEther == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(valueOfEther), hasTransactionData ? functionSigArgs : "", proposalName],
-    chainId: CHAIN_ID
+    chainId: CHAIN_ID,
+    overrides: {
+      value: valueOfEther == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(valueOfEther),
+    },
   });
 
 
